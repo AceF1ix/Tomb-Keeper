@@ -63,5 +63,16 @@ public class FirstPersonMovement : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime); // y = 1/2 * g * t^2
 
+
+
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Enemy")
+        {
+            Destroy(other.gameObject);
+        }
+
     }
 }

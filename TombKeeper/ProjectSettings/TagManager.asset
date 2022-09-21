@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Enemy
+  - homerune
+  - neithrune
   layers:
   - Default
   - TransparentFX
@@ -14,10 +17,10 @@ TagManager:
   - UI
   - Face
   - Ground
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Walls
+  - Rune
   - 
   - 
   - 
