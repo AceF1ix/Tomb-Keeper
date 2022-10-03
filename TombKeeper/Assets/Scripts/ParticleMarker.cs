@@ -10,6 +10,9 @@ public class ParticleMarker : MonoBehaviour
     public TextMeshProUGUI markerText;
     public TextMeshProUGUI runText;
     public TextMeshProUGUI winText;
+    public TextMeshProUGUI loseText;
+    public TextMeshProUGUI findText;
+    public bool neithruneCollect;
     private int maxMarkers = 10;
     private Vector3 Neithrune_collected = new Vector3(-190.8f, 0.62f, 67.0f);
 
@@ -37,8 +40,10 @@ public class ParticleMarker : MonoBehaviour
         {
             Destroy(other.gameObject);
             runText.enabled = true;
+            findText.enabled = false;
             homeRune.SetActive(true);
             GameObject.Find("Enemy").GetComponent<EnemyMovement>().New_Enemy_Pos(Neithrune_collected);
+            neithruneCollect = true;
         }
 
         if(other.gameObject.tag == "homerune")
@@ -48,5 +53,14 @@ public class ParticleMarker : MonoBehaviour
             runText.enabled = false;
             markerText.enabled = false;
         }
+
+        if(other.gameObject.tag == "Enemy")
+        {
+            Time.timeScale = 0;
+            loseText.enabled = true;
+            runText.enabled = false;
+            markerText.enabled = false;
+            findText.enabled = false;
+        }   
     }
 }
