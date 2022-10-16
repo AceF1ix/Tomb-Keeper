@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:TombKeeper/Assets/Lag1_Zone1_Backuo.unity.meta
 guid: ea2d2bf12e2a6c54382d7b04c25f0460
+========
+guid: 1ce5c6a54ec794343a7c900f5d3f0119
+>>>>>>>> 9e6150b314a8ad7e3811763a84a7c55871e1dba4:TombKeeper/Assets/Scenes/GameOver.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
