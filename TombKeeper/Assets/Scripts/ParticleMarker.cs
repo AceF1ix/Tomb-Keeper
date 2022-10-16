@@ -17,8 +17,9 @@ public class ParticleMarker : MonoBehaviour
     public bool neithruneCollect;
     public Camera cam;
     private float radius = 10f;
-    private int maxMarkers = 15;
+    private int maxMarkers = 25;
     private Vector3 Neithrune_collected = new Vector3(-190.8f, 0.62f, 67.0f);
+    public string chaseSound = "Why?";
 
     // Start is called before the first frame update
     void Start()
@@ -77,6 +78,7 @@ public class ParticleMarker : MonoBehaviour
         GameObject.Find("Enemy").GetComponent<EnemyMovement>().New_Enemy_Pos(Neithrune_collected);
         neithruneCollect = true;
         runText.enabled = true;
+        FindObjectOfType<AudioManager>().Play(chaseSound);
     }
 
     public void PlaceRune()

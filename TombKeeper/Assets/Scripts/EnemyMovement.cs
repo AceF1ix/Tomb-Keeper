@@ -39,7 +39,7 @@ public class EnemyMovement : MonoBehaviour
 
     // FOV Data
 
-    private float radius = 30;
+    private float radius = 40;
     private float angle = 90;
     private Vector3 origin;
     public GameObject playerRef;
