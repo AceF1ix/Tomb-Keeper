@@ -23,20 +23,17 @@ public class EnemyMovement : MonoBehaviour
 
     // Zone Control
 
-    private Vector3 center = new Vector3(0f, 0f, 0f);
+    [SerializeField] private Transform center;
     
     [SerializeField] private Transform enemy_pos_zone_1;
-    [SerializeField] private Transform enemy_pos_zone_2;
     [SerializeField] private Transform enemy_pos_zone_3;
     [SerializeField] private Transform enemy_pos_zone_4;
 
     private bool zone_1_travel = true;
-    private bool zone_2_travel = true;
     private bool zone_3_travel = true;
     private bool zone_4_travel = true;
 
     private bool in_zone_1 = false;
-    private bool in_zone_2 = false;
     private bool in_zone_3 = false;
     private bool in_zone_4 = false;
 
@@ -55,12 +52,10 @@ public class EnemyMovement : MonoBehaviour
     // Patrol Data
 
     public Transform[] waypoints1;
-    public Transform[] waypoints2;
     public Transform[] waypoints3;
     public Transform[] waypoints4;
 
     int wayPointIndex1;
-    int wayPointIndex2;
     int wayPointIndex3;
     int wayPointIndex4;
 
@@ -161,53 +156,35 @@ public class EnemyMovement : MonoBehaviour
 
     public void enemy_pos_zones(Vector3 position_given) {
         
-        if(position_given.x < 0f && position_given.z > 0f && zone_1_travel == true && canSeePlayer!=true) {
+        if(position_given.x < 0f && position_given.z > center.position.z && zone_1_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_1.position);
             zone_1_travel = false;
-            zone_2_travel = true;
             zone_3_travel = true;
 
             in_zone_1 = true;
-            in_zone_2 = false;
             in_zone_3 = false;
             in_zone_4 = false;
             UpdateDestination();
         }
 
-        if(position_given.x > 0f && position_given.z > 0f && zone_2_travel == true && canSeePlayer!=true) {
-            New_Enemy_Pos(enemy_pos_zone_2.position);
-            zone_2_travel = false;
-            zone_1_travel = true;
-            zone_4_travel = true;
-
-            in_zone_1 = false;
-            in_zone_2 = true;
-            in_zone_3 = false;
-            in_zone_4 = false;
-            UpdateDestination();
-        }
-
-        if(position_given.x < 0f && position_given.z < 0f && zone_3_travel == true && canSeePlayer!=true) {
+        if(position_given.x < 0f && position_given.z < center.position.z && zone_3_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_3.position);
             zone_3_travel = false;
             zone_1_travel = true;
             zone_4_travel = true;
 
             in_zone_1 = false;
-            in_zone_2 = false;
             in_zone_3 = true;
             in_zone_4 = false;
             UpdateDestination();
         }
 
-        if(position_given.x > 0f && position_given.z < 0f && zone_4_travel == true && canSeePlayer!=true) {
+        if(position_given.x > 0f && position_given.z < center.position.z && zone_4_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_4.position);
             zone_4_travel = false;
-            zone_2_travel = true;
             zone_3_travel = true;
             
             in_zone_1 = false;
-            in_zone_2 = false;
             in_zone_3 = false;
             in_zone_4 = true;
             UpdateDestination();
@@ -259,25 +236,16 @@ public class EnemyMovement : MonoBehaviour
         if(in_zone_1 == true) {
         target = waypoints1[wayPointIndex1].position;
         navMeshAgent.destination = target;
-
-        }
-
-        if(in_zone_2 == true) {
-        target = waypoints2[wayPointIndex2].position;
-        navMeshAgent.destination = target;
-
         }
 
         if(in_zone_3 == true) {
         target = waypoints3[wayPointIndex3].position;
         navMeshAgent.destination = target;
-
         }
 
         if(in_zone_4 == true) {
         target = waypoints4[wayPointIndex4].position;
         navMeshAgent.destination = target;
-
         }
 
     }
@@ -286,9 +254,6 @@ public class EnemyMovement : MonoBehaviour
 
         if(in_zone_1 == true)
         {wayPointIndex1++;}
-
-        if(in_zone_2 == true)
-        {wayPointIndex2++;}
 
         if(in_zone_3 == true)
         {wayPointIndex3++;}
@@ -300,10 +265,6 @@ public class EnemyMovement : MonoBehaviour
             wayPointIndex1 = 0;
         }
 
-        if(wayPointIndex2 == waypoints2.Length) {
-            wayPointIndex2 = 0;
-        }
-
         if(wayPointIndex3 == waypoints3.Length) {
             wayPointIndex3 = 0;
         }
@@ -313,6 +274,4 @@ public class EnemyMovement : MonoBehaviour
         }
 
     }
-
-
 }
