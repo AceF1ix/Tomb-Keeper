@@ -10,11 +10,20 @@ public class EnemyMovement : MonoBehaviour
     [SerializeField] private Transform playerPosition;
     private NavMeshAgent navMeshAgent;
     public bool hasPath;
+    public bool returnToOrigin;
+    public string chaseSound = "Heartbeat";
+
+    private enum State {
+        Patrol,
+        Chase,
+        Return,
+    }
+    private State state;
 
 
     // Zone Control
 
-    private Vector3 center = new Vector3(-111f, 0f, 38f);
+    private Vector3 center = new Vector3(0f, 0f, 0f);
     
     [SerializeField] private Transform enemy_pos_zone_1;
     [SerializeField] private Transform enemy_pos_zone_2;
@@ -64,38 +73,84 @@ public class EnemyMovement : MonoBehaviour
         playerRef = GameObject.FindGameObjectWithTag("Player");
         StartCoroutine(FOVroutine());
         UpdateDestination();
+        origin = transform.position;
+        state = State.Patrol;
     }
 
     private void Awake() {
         navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
-    private void Update() {
+    private void Update()
+    {
         if(!GameObject.Find("Player").GetComponent<ParticleMarker>().neithruneCollect)
         {
-            if(navMeshAgent.enabled == true && canSeePlayer) 
+            if(navMeshAgent.enabled == true && canSeePlayer)
             {
-                navMeshAgent.destination = playerPosition.position;
-                if (Time.timeScale != 0){
-                    //FindObjectOfType<AudioManager>().Play("TableTennis");
+                state = State.Chase;
+            }
+            else if (navMeshAgent.enabled == true && !canSeePlayer && !returnToOrigin)
+            {
+                state = State.Patrol; 
+            }
+            else if (returnToOrigin)
+            {
+                if (Vector3.Distance(transform.position, target) > 1f)
+                {
+                    state = State.Return;
+                }
+                else
+                {
+                    returnToOrigin = false;
+                    state = State.Patrol;
                 }
             }
-            else if (navMeshAgent.enabled == true && !canSeePlayer)
-            {
-                //FindObjectOfType<AudioManager>().Stop("TableTennis");
-                if (Vector3.Distance(transform.position, target) < 1f)
-                    {
-                        UpdateWayPointIndex();
-                        UpdateDestination();
-                    }   
-            }
-
             enemy_pos_zones(playerPosition.position);
         }
         else
         {
-            navMeshAgent.destination = playerPosition.position;
+            state = State.Chase;
         }
+
+        switch(state) {
+            case State.Patrol:
+                Patrol();
+                break;
+            case State.Chase:
+                Chase();
+                break;
+            case State.Return:
+                Return();
+                break;  
+        }
+    }
+
+    public void Patrol()
+    {
+        FindObjectOfType<AudioManager>().Stop(chaseSound);
+        navMeshAgent.autoBraking = true;
+        if (Vector3.Distance(transform.position, target) < 1f)
+        {
+            UpdateWayPointIndex();
+            UpdateDestination();
+        }
+    }
+
+    public void Chase()
+    {
+        navMeshAgent.autoBraking = false;
+        navMeshAgent.destination = playerPosition.position;
+        if (Time.timeScale != 0)
+        {
+            FindObjectOfType<AudioManager>().Play(chaseSound);
+        }
+    }
+
+    public void Return()
+    {
+        navMeshAgent.autoBraking = true;
+        FindObjectOfType<AudioManager>().Stop(chaseSound);
+        navMeshAgent.destination = target;
     }
 
     public void New_Enemy_Pos(Vector3 position_given) {
@@ -106,7 +161,7 @@ public class EnemyMovement : MonoBehaviour
 
     public void enemy_pos_zones(Vector3 position_given) {
         
-        if(position_given.x < -111f && position_given.z > 38f && zone_1_travel == true && canSeePlayer!=true) {
+        if(position_given.x < 0f && position_given.z > 0f && zone_1_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_1.position);
             zone_1_travel = false;
             zone_2_travel = true;
@@ -119,7 +174,7 @@ public class EnemyMovement : MonoBehaviour
             UpdateDestination();
         }
 
-        if(position_given.x > -111f && position_given.z > 38f && zone_2_travel == true && canSeePlayer!=true) {
+        if(position_given.x > 0f && position_given.z > 0f && zone_2_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_2.position);
             zone_2_travel = false;
             zone_1_travel = true;
@@ -132,7 +187,7 @@ public class EnemyMovement : MonoBehaviour
             UpdateDestination();
         }
 
-        if(position_given.x < -111f && position_given.z < 38f && zone_3_travel == true && canSeePlayer!=true) {
+        if(position_given.x < 0f && position_given.z < 0f && zone_3_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_3.position);
             zone_3_travel = false;
             zone_1_travel = true;
@@ -145,7 +200,7 @@ public class EnemyMovement : MonoBehaviour
             UpdateDestination();
         }
 
-        if(position_given.x > -111f && position_given.z < 38f && zone_4_travel == true && canSeePlayer!=true) {
+        if(position_given.x > 0f && position_given.z < 0f && zone_4_travel == true && canSeePlayer!=true) {
             New_Enemy_Pos(enemy_pos_zone_4.position);
             zone_4_travel = false;
             zone_2_travel = true;
@@ -173,7 +228,6 @@ public class EnemyMovement : MonoBehaviour
     }
 
     private void FieldOfViewCheck()
-
     {
         Collider[] rangeChecks = Physics.OverlapSphere(transform.position, radius, targetMask);
 
@@ -188,10 +242,11 @@ public class EnemyMovement : MonoBehaviour
             {
                 canSeePlayer = true;
             }
-            else if (distanceToTarget > radius)
-            {
-                canSeePlayer = false;
-            }
+        }
+        else if (canSeePlayer && origin != transform.position)
+        {
+            canSeePlayer = false;
+            returnToOrigin = true;
         }
         else if (canSeePlayer)
         {
